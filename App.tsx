@@ -1,118 +1,84 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import Animated, {
+  useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import { Button, StyleSheet, View } from 'react-native';
 
 import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const colors = [
+  ['lime', 'green'],
+  ['blue', 'cyan'],
+];
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+export default function ChessboardExample() {
+  const [state, setState] = React.useState(0);
 
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+  const ref = React.useRef(0);
 
-function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  const sv = useSharedValue(0);
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  const size = useDerivedValue(() => {
+    return 10 + sv.value * 20;
+  });
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      width: size.value,
+      height: size.value,
+    };
+  }, []);
+
+  const handleAnimateSize = () => {
+    ref.current = 1 - ref.current;
+    sv.value = withTiming(ref.current, { duration: 2000 });
+  };
+
+  const handleToggleColors = () => {
+    setState((s) => 1 - s);
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+    <>
+      <View style={styles.buttons}>
+        <Button onPress={handleAnimateSize} title="Animate size" />
+        <Button onPress={handleToggleColors} title="Toggle colors" />
+      </View>
+      <View style={styles.chessboard}>
+        <View style={styles.border}>
+          {[...Array(12).keys()].map((i) => (
+            <View style={styles.row} key={i}>
+              {[...Array(12).keys()].map((j) => (
+                <Animated.View
+                  key={j}
+                  style={[
+                    { backgroundColor: colors[state % 2][(i + j) % 2] },
+                    animatedStyle,
+                  ]}
+                />
+              ))}
+            </View>
+          ))}
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  buttons: {
+    marginVertical: 50,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  chessboard: {
+    alignItems: 'flex-start',
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  border: {
+    borderWidth: 10,
+    borderColor: 'red',
   },
-  highlight: {
-    fontWeight: '700',
+  row: {
+    flexDirection: 'row',
   },
 });
-
-export default App;
