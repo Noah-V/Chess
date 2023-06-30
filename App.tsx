@@ -1,10 +1,11 @@
+/* eslint-disable prettier/prettier */
 import Animated, {
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { Button, StyleSheet, View } from 'react-native';
+import {Button, StyleSheet, View} from 'react-native';
 
 import React from 'react';
 
@@ -16,7 +17,7 @@ const colors = [
 export default function ChessboardExample() {
   const [state, setState] = React.useState(0);
 
-  const ref = React.useRef(0);
+  const ref = React.useRef(0.3);
 
   const sv = useSharedValue(0);
 
@@ -33,11 +34,11 @@ export default function ChessboardExample() {
 
   const handleAnimateSize = () => {
     ref.current = 1 - ref.current;
-    sv.value = withTiming(ref.current, { duration: 2000 });
+    sv.value = withTiming(ref.current, {duration: 2000});
   };
 
   const handleToggleColors = () => {
-    setState((s) => 1 - s);
+    setState(s => 1 - s);
   };
 
   return (
@@ -48,13 +49,13 @@ export default function ChessboardExample() {
       </View>
       <View style={styles.chessboard}>
         <View style={styles.border}>
-          {[...Array(12).keys()].map((i) => (
+          {[...Array(12).keys()].map(i => (
             <View style={styles.row} key={i}>
-              {[...Array(12).keys()].map((j) => (
+              {[...Array(12).keys()].map(j => (
                 <Animated.View
                   key={j}
                   style={[
-                    { backgroundColor: colors[state % 2][(i + j) % 2] },
+                    {backgroundColor: colors[state % 2][(i + j) % 2]},
                     animatedStyle,
                   ]}
                 />
